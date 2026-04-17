@@ -1,0 +1,26 @@
+@font-face {
+  font-family: Diary_of_an_8-bit_mage;
+  src: url(fonts/Diary\ of\ an\ 8-bit\ mage.otf);
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background-color: black;
+}
+canvas {
+  display: block;
+}
+
+#log {
+  border: 1vmin;
+  border-radius: 3vmin;
+  padding: 1vmin;
+  margin: 1vmin;
+  background-color: midnightblue;
+  color: white;
+  border-style: solid;
+  border-color:darkgoldenrod;
+  overflow-y: auto;
+  font-family: Diary_of_an_8-bit_mage;
+}
