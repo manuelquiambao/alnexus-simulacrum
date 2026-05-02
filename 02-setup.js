@@ -1,3 +1,5 @@
+// MATH FUNCTION REPOSITORY
+
 function floorZero(number) {
     // for when you don't want a value to roll into the negatives...
     if (number <= 0) {
@@ -53,6 +55,22 @@ function getDelta(x1, x2, y1, y2) {
   return (y2 - y1) / (x2 - x1);
 }
 
+// RGB VALUE ARRAY REPOSITORY
+// used for notifications where CSS colors aren't enough and opacities need to be appended
+
+let c_white = [255, 255, 255];
+let c_black = [0, 0, 0];
+let c_red = [255, 0, 0];
+let c_darkred = [128, 0, 0];
+let c_purple = [145, 60, 200];
+let c_darkpurple = [100, 20, 100];
+let c_blue1 = [45, 70, 225];
+let c_lightblue1 = [200, 255, 255];
+
+let c_midnightblue = [25, 25, 112];
+let c_darkkhaki = [189,183,107];
+
+// variables
 let conditions = [];
 let weapons = [];
 let armors = [];
@@ -133,6 +151,8 @@ let healthbars = [];
 let party_spiritbars = [];
 let statTints;
 
+let notifs = [];
+
 let activesShown = false;
 
 let partyTargets = [];
@@ -158,6 +178,11 @@ function centeredText(content, x, y, w, h) {
 function centeredTextBounded(content, x, y, w, h) {
     textAlign(CENTER, CENTER);
     text(content, x * scaling , y * scaling, w * scaling, h * scaling);
+}
+
+function centeredTextUnbound(content, x, y) {
+  textAlign(CENTER, CENTER);
+  text(content, x * scaling, y * scaling);
 }
 
 function leftCenteredText(content, x, y, w, h) {
@@ -669,6 +694,97 @@ class TextInputComp {
         }
     }
 }
+
+class Notif {
+  constructor(x, y, fontsize, padding, content, duration, type) {
+    this.x = x;
+    this.y = y;
+    this.fontsize = fontsize;
+    this.padding = padding;
+    this.content = content;
+    this.type = type;
+    
+    this.start = frameCount;
+    this.duration = duration;
+    this.end = this.start + this.duration;
+    
+    this.font = Diary_of_an_8bit_mage;
+    
+    this.bbox = null;
+    this.w = 0;
+    this.h = 0;
+    this.a = 255;
+    this.boxIsShown = true;
+    
+    this.elapsed = 0;
+    
+    this.isShown = false;
+  }
+  
+  show() {
+    let c_box = []; let c_border = []; let c_font = [];
+    
+    if (this.type === "base" || this.type === null) {
+      c_box = c_white; c_border = c_black; c_font = c_black;
+    }
+    
+    if (this.type === "error") {
+      c_box = c_darkred; c_border = c_red; c_font = c_white;
+    }
+    
+    if (this.type === "effect") {
+      c_box = c_blue1; c_border = c_lightblue1; c_font = c_white;
+    }
+    
+    if (this.type === "desc") {
+      c_box = c_midnightblue; c_border = c_darkkhaki; c_font = c_white;
+    }
+    
+    if (this.type === "font-only") {
+      c_box = c_black; c_border = c_black; c_font = c_black;
+    }
+    
+    if (this.type === "font-only") {
+      this.boxIsShown = false;
+    }
+    let opacity = 255 - ((255 / this.duration) * this.elapsed);
+    opacity = Math.floor(opacity);
+    // get text bounds
+    push();
+    textSize(this.fontsize);
+    this.bbox = this.font.textBounds(this.content,this.x * scaling,this.y * scaling);
+    this.w = this.bbox.w / scaling;
+    this.h = this.bbox.h / scaling;
+    pop();
+    
+    // if 
+    if (frameCount < this.end && frameCount >= this.start) {
+      this.isShown = true;
+      if (this.boxIsShown) {
+       push();
+      stroke(c_border[0], c_border[1], c_border[2], opacity);
+      strokeWeight(this.h / 8 * scaling);
+      fill(c_box[0], c_box[1], c_box[2], opacity);
+      rect((this.x - (this.w / 2) - this.padding) * scaling, (this.y - (this.h / 2) - this.padding) * scaling, (this.w + (this.padding*2)) * scaling, (this.h + (this.padding*2)) * scaling, 7);
+      pop(); 
+      }
+    
+      push();
+      textFont(this.font);
+      textSize(this.fontsize);
+      fill(c_font[0], c_font[1], c_font[2], opacity);
+      centeredTextUnbound(this.content, this.x, this.y);
+      pop();
+    
+      this.y -= (1 / scaling);
+      this.elapsed += 1;
+    }
+    else {
+      this.isShown = false;
+    }
+  }
+}
+
 class ImageComp {
     constructor(source, state, x, y, w, h) {
         this.source = source;
@@ -851,7 +967,7 @@ class StatSlider {
 
         this.x = x; this.y = y;
         this.positiontype = "relative";
-        this.parent = ui; // change this to ui after!
+        this.parent = ui;
         this.x += this.parent.x; this.y += this.parent.y;
         
         this.w = w;
@@ -1149,6 +1265,7 @@ function dealFX(action, actor, target) {
             }
             fxTarget.inBattleFX.push(fx);
             if (fx.onsetDialog != null) {
+                notifs.push(new Notif(fxTarget.posX + fxTarget.scaleX, fxTarget.posY + fxTarget.scaleY, 20, 0.3, `${fx.name}!`, 60, "effect"));
                 console.log(fxTarget.name + fx.onsetDialog);
                 divLog.html('<p>' +fxTarget.name + fx.onsetDialog + '</p>', true)
             }
@@ -1177,8 +1294,11 @@ function activateInBattleFx(player, tic) {
 
                     if (Math.random() <= thisFX.activationChance) { // and chance says yes...
 
-                        console.log("[Effect] " + player.name + "'s " + thisFX.name + " activated!"); // activate the effect!
-                        divLog.html('<p>' +"[Effect] " + player.name + "'s " + thisFX.name + " activated!" + '</p>', true)
+                        // console.log("[Effect] " + player.name + "'s " + thisFX.name + " activated!"); // activate the effect!
+                        // divLog.html('<p>' +"[Effect] " + player.name + "'s " + thisFX.name + " activated!" + '</p>', true)
+                        if (thisFX.name != "KO") {
+                            notifs.push(new Notif(player.posX + player.scaleX, player.posY + player.scaleY, 20, 0.3, `${thisFX.name}`, 60, "effect"));
+                        }
 
                         if (thisFX.valueFunction != null && thisFX.valueModded != null) {
                             let valChanged = thisFX.valueModded;
@@ -1590,6 +1710,12 @@ class TroopMember extends Monster {
 
         if (this.size === "small") {
             this.scaleX = 4; this.scaleY = 4;
+        }
+        if (this.size === "wide") {
+            this.scaleX = 6; this.scaleY = 4;
+        }
+        if (this.size === "medium") {
+            this.scaleX = 6; this.scaleY = 6;
         }
     }
 }
@@ -2139,6 +2265,8 @@ function whoseTurn(num) {
         button_actives[i].desc = "";
     }
 
+    activesShown = false;
+    
     if (activeActor.constructor.name === "PartyMember") {
         // set up available abilities here
         for (let i = 0; i < activeActor.learnedActives.length; i++) {
@@ -2196,8 +2324,8 @@ function showAbilities(actor) {
         button_actives[i].desc = `Type: ${actor.learnedActives[i].type} // SP Cost: ${actor.learnedActives[i].spCost} // ${actor.learnedActives[i].desc}`;
         activesAsString += actor.learnedActives[i].name + ", ";
     }
-    console.log("Available abilities: " + activesAsString);
-    console.log("Type useAbility() to activate a chosen ability.");
+    // console.log("Available abilities: " + activesAsString);
+    // console.log("Type useAbility() to activate a chosen ability.");
 }
 
 function hideAbilities() {
@@ -2208,8 +2336,13 @@ function hideAbilities() {
 function useAbility(activeChosen) {
     for (let i = 0; i < activeActor.learnedActives.length; i++) {
         if (activeChosen === activeActor.learnedActives[i].name) {
-            registeredAction = new BattleAction(activeActor.learnedActives[i], activeActor);
-            getActionTargets(registeredAction);
+            let active = activeActor.learnedActives[i];
+            if (activeActor.combatStats.SP < active.spCost && activeActor.constructor.name === "PartyMember") {
+                notifs.push(new Notif(mouseX / scaling, mouseY / scaling, 24, 0.2, "Not enough SP!", 120, "error"))
+            } else {
+                registeredAction = new BattleAction(activeActor.learnedActives[i], activeActor);
+                getActionTargets(registeredAction);
+            }
         }
     }
 }
@@ -2842,6 +2975,20 @@ function setup() {
         [basicAttack], loaded_enemies[5], "small"
     );
 
+    monsters[6] = new Monster(
+        "Maindeu", "One of the hands of the God of Life.",
+        { HP: 500, SP: 40, STR: 35, DEF: 20, MAG: 25, MDF: 15, SPD: 5, DEX: 2 },
+        weapons[0], armors[0], null,
+        [basicAttack], loaded_enemies[6], "wide"
+    );
+
+    monsters[7] = new Monster(
+        "Golem", "An artifact of life.",
+        { HP: 750, SP: 50, STR: 20, DEF: 30, MAG: 15, MDF: 30, SPD: 7, DEX: 7 },
+        weapons[0], armors[0], null,
+        [basicAttack], loaded_enemies[7], "medium"
+    );
+
     statTints = {
     HP: color('green'), SP: color('blue'),
     STR: color('red'), DEF: color('yellow'),
@@ -2876,10 +3023,19 @@ function setup() {
             party[i].scaleX, party[i].scaleY);
     }
 
-    for (let i = 0; i < 6; i++) {
+    for (let i = 0; i < 8; i++) {
         troop[i] = new TroopMember(monsters[i], 2, 0, 0);
         troop[i].posX = (Math.floor(i / 3)) * 4;
         troop[i].posY = 0 + (4 * (i % 3));
+
+        if (i === 6) {
+            troop[i].posX = 8;
+            troop[i].posY = 0;
+        }
+        if (i === 7) {
+            troop[i].posX = 8;
+            troop[i].posY = 4;
+        }
 
         troop[i].imageComp = new ImageComp(
             troop[i].imageSource, "enemy",
@@ -2987,6 +3143,10 @@ function uiBack() {
     ui_mode = switchUIMode(ui_list);
 }
 
+function uiSet(val) {
+    ui_list = val;
+    ui_mode = switchUIMode(ui_list);
+}
 function switchUIMode(num) {
     if (num === 0) {uiStateTitle.content = "Equipment & Abilities"; return "equip"; }
         else {if (num === 1) {uiStateTitle.content = "Stat Spread"; return "stats";}
@@ -2995,7 +3155,6 @@ function switchUIMode(num) {
             }
         }
     }
-    console.log(num);
 }
 
 function changeRole(value) {
@@ -3006,6 +3165,7 @@ function changeRole(value) {
             uiFetchRole.desc = roles[i].desc;
             selectedItem.updateStatsAndEquipment();
             showEquipped();
+            notifs.push(new Notif(mouseX / scaling, mouseY / scaling, 16, 0.1, `Role changed to ${roles[i].name}!`, 60, "desc"));
         }
     }
 }
@@ -3046,6 +3206,8 @@ function changeNature(value) {
             uiFetchNature.desc = natures[i].desc;
             selectedItem.updateStatsAndEquipment();
             showEquipped();
+            notifs.push(new Notif(mouseX / scaling, mouseY / scaling, 16, 0.1, `${natures[i].boon} increased!
+${natures[i].bane} decreased!`, 60, "desc"));
         }
     }
 }

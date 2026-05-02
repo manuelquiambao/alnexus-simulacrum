@@ -1,7 +1,14 @@
 let loaded_scenes = [];
 let loaded_bb = [];
+
 let loaded_allies = [];
 let loaded_enemies = [];
+let enemy_types = [];
+enemy_types[0] = 6; // small
+enemy_types[1] = 1; // wide
+enemy_types[2] = 0; // tall
+enemy_types[3] = 1; // medium
+
 let loaded_ui = [];
 let loaded_header = [];
 let loaded_footer = [];
@@ -19,6 +26,7 @@ let Boomer_Tantrum;
 let Tincture;
 let Yetimology;
 let Diary_of_an_8bit_mage;
+
 class Source {
   constructor() {
     this.pic = null;
@@ -36,7 +44,7 @@ function preload() {
   loaded_bb[0] = new Source();
   loaded_bb[0].pic = loadImage("img/bb_00.png");
   
-  for (let i = 0; i <= 3; i++) {
+  for (let i = 0; i < 4; i++) {
     loaded_allies[i] = new Source();
     if (i < 10) {
       loaded_allies[i].pic = loadImage("img/a0"+i+".png");
@@ -47,8 +55,35 @@ function preload() {
       loaded_allies[i].name = "a0"+i+".png";
     }
   }
-  
-  for (let i = 0; i <= 5; i++) {
+
+  let enemy_amount = 0;
+  let total = 0;
+
+  for (let i = 0; i < enemy_types.length; i++) {
+    enemy_amount += enemy_types[i];
+    let append = '';
+    if (i === 0) { append = 's'; }
+    if (i === 1) { append = 'w'; }
+    if (i === 2) { append = 't'; }
+    if (i === 3) { append = 'm'; }
+    for (let i = 0; total < enemy_amount; i++) {
+      loaded_enemies[total] = new Source();
+    if (i < 10) {
+      // `img/e${append}0${i}.png`
+      // `img/e${append}0${i}h.png`
+        loaded_enemies[total].pic = loadImage(`img/e${append}0${i}.png`);
+        loaded_enemies[total].halo = loadImage(`img/e${append}0${i}h.png`);
+        loaded_enemies[total].activeGlow = loadImage(`img/e${append}0${i}h.png`);
+        loaded_enemies[total].gray = loadImage(`img/e${append}0${i}.png`);
+        loaded_enemies[total].gray.filter(GRAY);
+        loaded_enemies[total].name = `e${append}0${i}.png`;
+        total += 1;
+      }
+    }
+  }
+
+  /*
+  for (let i = 0; i < 6; i++) {
     loaded_enemies[i] = new Source();
     if (i < 10) {
       loaded_enemies[i].pic = loadImage("img/es0"+i+".png");
@@ -59,6 +94,7 @@ function preload() {
       loaded_enemies[i].name = "es0"+i+".png";
     }
   }
+    */
   
   for (let i = 0; i <= 3; i++) {
     loaded_role_symbols[i] = new Source();

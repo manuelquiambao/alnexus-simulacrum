@@ -167,6 +167,15 @@ function draw() {
     }
     }
   }
+
+  for (let notif of notifs) {
+    notif.show();
+  }
+    notifs = notifs.filter(
+      function(notif) {
+        return notif.isShown;
+      }
+    );
 }
 
 function makeUIElements(doThis) {
@@ -336,6 +345,7 @@ let newLevel = 0;
 let latestValue = 0;
 
 let draggedEdit = false;
+
 function mousePressed() {
   clickedItem = determineClickedItem();
   if (clickedItem.constructor.name === "LevelSlider" || clickedItem.constructor.name === "StatSlider") {
@@ -555,6 +565,7 @@ function mouseClicked() {
     if (windowState === "idle" &&
       (clickedItem.state === "enemy" || clickedItem.state === "ally")) {
       selectedActor.source = clickedItem.source;
+      uiSet(1);
       if (clickedItem.state === "ally") {
         console.log(clickedItem);
         for (let i = 0; i < party.length; i++) {
