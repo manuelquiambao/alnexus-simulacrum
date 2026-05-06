@@ -5,10 +5,24 @@ let loaded_allies = [];
 let loaded_enemies = [];
 let enemy_types = [];
 enemy_types[0] = 6; // small
-enemy_types[1] = 1; // wide
+enemy_types[1] = 0; // wide
 enemy_types[2] = 0; // tall
-enemy_types[3] = 1; // medium
+enemy_types[3] = 0; // medium
 
+function getThisEnemySize(index, typeOfVar) {
+  if (typeOfVar === 'character') {
+    if (index === 0) { return 's'; }
+    if (index === 1) { return 'w'; }
+    if (index === 2) { return 't'; }
+    if (index === 3) { return 'm'; }
+  }
+  if (typeOfVar === 'text_string') {
+    if (index === 0) { return 'small'; }
+    if (index === 1) { return 'wide'; }
+    if (index === 2) { return 'tall'; }
+    if (index === 3) { return 'medium'; }
+  }
+}
 let loaded_ui = [];
 let loaded_header = [];
 let loaded_footer = [];
@@ -60,12 +74,9 @@ function preload() {
   let total = 0;
 
   for (let i = 0; i < enemy_types.length; i++) {
+    // add amount of enemies of a certain size to the enemy amount
     enemy_amount += enemy_types[i];
-    let append = '';
-    if (i === 0) { append = 's'; }
-    if (i === 1) { append = 'w'; }
-    if (i === 2) { append = 't'; }
-    if (i === 3) { append = 'm'; }
+    let append = getThisEnemySize(i, "character");
     for (let i = 0; total < enemy_amount; i++) {
       loaded_enemies[total] = new Source();
     if (i < 10) {

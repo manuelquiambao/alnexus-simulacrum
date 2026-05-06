@@ -160,6 +160,8 @@ let troopTargets = [];
 
 let divLog;
 
+let button_add_enemy = [];
+
 function isTargetted(afflicted) { let bool = false; for (let i = 0; i < actionTargets.length; i++) { if (afflicted === actionTargets[i]) { bool = true; } } return bool; }
 
 function isActor(afflicted) { let bool = false; if (afflicted === activeActor) { bool = true; } return bool; }
@@ -2923,7 +2925,7 @@ function setup() {
 
     characters[2] = new Character(
         "Iota", "An Astral whose task is to surgically remove imperfections in the universe. Volunteered his visage and skills for this experiment.",
-        { HP: 3.5, SP: 4, STR: 6, DEF: 2.5, MAG: 6, MDF: 3, SPD: 6, DEX: 6.5 },
+        { HP: 3.5, SP: 4, STR: 8, DEF: 2.5, MAG: 7, MDF: 3, SPD: 6, DEX: 6.5 },
         roles[3], natures[0], loaded_allies[2], "ally"
     );
 
@@ -2937,57 +2939,88 @@ function setup() {
         "Mitochondroid", "An amorphous blob of autonomous clay.",
         { HP: 200, SP: 0, STR: 25, DEF: 13, MAG: 10, MDF: 10, SPD: 5, DEX: 3 },
         weapons[0], armors[0], null,
-        [basicAttack], loaded_enemies[0], "small"
+        [basicAttack]
     );
 
     monsters[1] = new Monster(
         "Timewastrel", "A goblinoid that hoards sands of time.",
         { HP: 100, SP: 0, STR: 35, DEF: 15, MAG: 25, MDF: 8, SPD: 28, DEX: 15 },
         weapons[4], armors[5], [passives[6]],
-        [basicAttack], loaded_enemies[1], "small"
+        [basicAttack]
     );
 
     monsters[2] = new Monster(
         "Floating Throne", "A living surveillance device for angels.",
         { HP: 300, SP: 20, STR: 25, DEF: 21, MAG: 35, MDF: 29, SPD: 13, DEX: 5 },
         weapons[1], armors[1], [passives[3]],
-        [basicAttack, basicAttack, actives[6]], loaded_enemies[2], "small"
+        [basicAttack, basicAttack, actives[6]]
     );
 
     monsters[3] = new Monster(
         "Angelic Nephil", "A curious wayward angel.",
         { HP: 275, SP: 50, STR: 25, DEF: 13, MAG: 25, MDF: 45, SPD: 19, DEX: 15 },
         weapons[12], armors[6], [passives[6]],
-        [basicAttack, actives[6], actives[9]], loaded_enemies[3], "small"
+        [basicAttack, actives[6], actives[9]]
     );
 
     monsters[4] = new Monster(
         "Demonic Nephil", "A curious wayward demon.",
         { HP: 275, SP: 50, STR: 25, DEF: 45, MAG: 25, MDF: 13, SPD: 24, DEX: 10 },
         weapons[11], armors[6], [passives[6]],
-        [basicAttack, actives[7], basicAttack, actives[5]], loaded_enemies[4], "small"
+        [basicAttack, actives[7], basicAttack, actives[5]]
     );
 
     monsters[5] = new Monster(
         "Baksha", "A beast corrupted by the essence of dreams.",
         { HP: 375, SP: 30, STR: 36, DEF: 27, MAG: 31, MDF: 35, SPD: 17, DEX: 21 },
         weapons[12], armors[5], null,
-        [basicAttack], loaded_enemies[5], "small"
+        [basicAttack]
     );
 
+    /*
     monsters[6] = new Monster(
         "Maindeu", "One of the hands of the God of Life.",
         { HP: 500, SP: 40, STR: 35, DEF: 20, MAG: 25, MDF: 15, SPD: 5, DEX: 2 },
         weapons[0], armors[0], null,
-        [basicAttack], loaded_enemies[6], "wide"
+        [basicAttack]
     );
 
     monsters[7] = new Monster(
+        "Stymphalian", "A birdlike creature born from the deserts of time, made of sand and bronze.",
+        { HP: 500, SP: 40, STR: 35, DEF: 20, MAG: 25, MDF: 15, SPD: 5, DEX: 2 },
+        weapons[0], armors[0], null,
+        [basicAttack]
+    );
+
+    monsters[8] = new Monster(
+        "Fata Morgana", "A whale born from a mirage, known for swimming through the five Dimensions.",
+        { HP: 500, SP: 40, STR: 35, DEF: 20, MAG: 25, MDF: 15, SPD: 5, DEX: 2 },
+        weapons[0], armors[0], null,
+        [basicAttack]
+    );
+
+    monsters[9] = new Monster(
         "Golem", "An artifact of life.",
         { HP: 750, SP: 50, STR: 20, DEF: 30, MAG: 15, MDF: 30, SPD: 7, DEX: 7 },
         weapons[0], armors[0], null,
-        [basicAttack], loaded_enemies[7], "medium"
+        [basicAttack]
     );
+    */
+
+    let enemy_amount = 0;
+    let total = 0;
+
+    // add image sources + size!
+  for (let i = 0; i < enemy_types.length; i++) {
+    // add amount of enemies of a certain size to the enemy amount
+    enemy_amount += enemy_types[i];
+    let append = getThisEnemySize(i, "text_string");
+    for (let i = 0; total < enemy_amount; i++) {
+      monsters[total].imageSource = loaded_enemies[total];
+      monsters[total].size = append;
+      total += 1;
+    }
+  }
 
     statTints = {
     HP: color('green'), SP: color('blue'),
@@ -3023,11 +3056,12 @@ function setup() {
             party[i].scaleX, party[i].scaleY);
     }
 
-    for (let i = 0; i < 8; i++) {
+    for (let i = 0; i < 6; i++) {
         troop[i] = new TroopMember(monsters[i], 2, 0, 0);
         troop[i].posX = (Math.floor(i / 3)) * 4;
         troop[i].posY = 0 + (4 * (i % 3));
 
+        /*
         if (i === 6) {
             troop[i].posX = 8;
             troop[i].posY = 0;
@@ -3036,12 +3070,14 @@ function setup() {
             troop[i].posX = 8;
             troop[i].posY = 4;
         }
+            */
 
         troop[i].imageComp = new ImageComp(
             troop[i].imageSource, "enemy",
             troop[i].posX, troop[i].posY,
             troop[i].scaleX, troop[i].scaleY);
     }
+    troop.length -= 3;
 
     ui_mode = "equip";
 
@@ -3100,6 +3136,9 @@ function setup() {
     
     button_playtest = new ButtonComp("Playtest", "idle-hotkey", null, "Test out current configuration of party members and troop formation", initialiseBattle, 20, 15, 2, 2);
     button_stop_playtest = new ButtonComp("Stop Playtest", "playtest-hotkey", null, "Stop current playtest", stopBattle, 20, 15, 2, 2);
+
+    // button_add_enemy[0] = new ButtonComp("small", "idle-hotkey", null, "Add an enemy of a small size", addNewEnemy, 2, 15, 2, 2);
+
     button_attack = new ButtonComp("Attack", "playtest-hotkey", null, basicAttack.desc, getAction, 12, 14, 6, 1);
     button_abilities = new ButtonComp("Abilities", "playtest-hotkey", null, "Show abilities of the actor", getAction, 12, 15, 6, 1);
     for (let i = 0; i < 5; i++) {
@@ -3158,6 +3197,7 @@ function switchUIMode(num) {
 }
 
 function changeRole(value) {
+    console.log(value);
     for (let i = 0; i < roles.length; i++) {
         if (roles[i].name === value) {
             selectedItem.role = roles[i];
@@ -3208,6 +3248,107 @@ function changeNature(value) {
             showEquipped();
             notifs.push(new Notif(mouseX / scaling, mouseY / scaling, 16, 0.1, `${natures[i].boon} increased!
 ${natures[i].bane} decreased!`, 60, "desc"));
+        }
+    }
+}
+
+function addNewEnemy(size) {
+    console.log(size);
+  let scale_x = 0; let scale_y = 0;
+
+  if (size === "small") { scale_x = 4; scale_y = 4; }
+  if (size === "medium") { scale_x = 6; scale_y = 6; }
+  if (size === "wide") { scale_x = 6; scale_y = 4; }
+  
+  let temp_x = 0;
+  let temp_y = 0;
+
+  let enemybb_w = bb.w - 4; // this makes the width of the bounds 16
+  let enemybb_h = bb.h;
+  
+  let image_order = 0;
+  let images_overlapped = 0;
+  
+  let out_of_bounds = true;
+  let overlappingAtAll = true;
+
+  for (let x = 0; x < bb.w && overlappingAtAll; x++) {
+    temp_x = x;
+    for (let y = 0; y < bb.h && overlappingAtAll; y++) {
+      temp_y = y;
+      
+      // check if the result will be out of bounds
+      out_of_bounds = outOfBounds(0, 0, enemybb_w, enemybb_h, temp_x, temp_y, temp_x + scale_x, temp_y + scale_y);
+      
+      
+      if (!out_of_bounds) {
+        // if it isn't, check for overlapping images
+        images_overlapped = 0;
+        for (let monster of troop) {
+        image_order += 1;
+        if (rectanglesOverlapping(
+          monster.posX, monster.posY, monster.posX + monster.scaleX, monster.posY + monster.scaleY,
+          temp_x, temp_y, temp_x + scale_x, temp_y + scale_y,)) {
+          
+          images_overlapped += 1;      
+          }
+        }
+      }
+      
+      // once confirmed, stop the loop early!
+      if (images_overlapped <= 0 && !out_of_bounds) {
+        overlappingAtAll = false;
+      }
+    }
+  }
+  
+  if (!overlappingAtAll && !out_of_bounds) {
+    if (size === "small") {
+      troop.push(new TroopMember(monsters[0],3,temp_x,temp_y));
+      pushImageOn(troop, troop.length - 1);
+    }
+    if (size === "medium") {
+      troop.push(new ImageComp(loaded_enemies[1],"medium",temp_x,temp_y));
+    }
+    if (size === "wide") {
+      troop.push(new ImageComp(loaded_enemies[2],"wide",temp_x,temp_y));
+    }
+  }
+  else {
+        notifs.push(new Notif(mouseX / scaling, mouseY / scaling, 16, 0.3, "No spaces found!", 90, "error"));
+    }
+}
+
+function outOfBounds (board_left, board_top, board_right, board_bottom, B_left, B_top, B_right, B_bottom) {
+  return B_right > board_right || B_left < board_left || B_bottom > board_bottom || B_top < board_top;
+}
+function rectanglesOverlapping(A_left, A_top, A_right, A_bottom, B_left, B_top, B_right, B_bottom) {
+  // rectangles can be summed up into two extreme points, the top-left and the bottom-right points.
+  // if the left of B is greater than or equal to the right of A, B is to the right of A
+  // if the right of B is less than or equal to the left of A, B is to the left of A
+  // if the top of B is greater than or equal to the bottom of A, B is below A
+  // if the bottom of B is less than or equal to the top of A, B is on top of A
+  // if any of these conditions are met, the two rectangles are NOT overlapping, so we add a "not" operator
+
+  // if the left, right, top, and bottom of A and B are both equal, they are sitting on top of each other
+  
+  // if any of these conditions are true, the rectangles are overlapping.
+  return ((!(B_left >= A_right || B_right <= A_left || B_top >= A_bottom || B_bottom <= A_top)) ||
+          (B_left == A_left && B_right == A_right && B_top == A_top && B_bottom == A_bottom));
+}
+
+function pushImageOn(group, value) {
+    if (group === party) {
+        group[value].imageComp = new ImageComp(
+            group[value].imageSource, "ally",
+            group[value].posX, group[value].posY,
+            group[value].scaleX, group[value].scaleY);
+    } else {
+        if (group === troop) {
+            group[value].imageComp = new ImageComp(
+                group[value].imageSource, "enemy",
+                group[value].posX, group[value].posY,
+                group[value].scaleX, group[value].scaleY);
         }
     }
 }

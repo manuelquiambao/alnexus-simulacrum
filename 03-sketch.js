@@ -133,6 +133,9 @@ function draw() {
       makeUIElements("show");
       partyStats.hide();
       button_playtest.hide();
+      for (let button of button_add_enemy) {
+        button.hide();
+      }
       button_stop_playtest.hide();
       button_attack.hide();
       button_abilities.hide();
@@ -149,6 +152,9 @@ function draw() {
     if (windowState === "idle") {
       partyStats.hide();
       button_playtest.show();
+      for (let button of button_add_enemy) {
+        button.show();
+      }
       button_stop_playtest.hide();
       button_attack.hide();
       announcer.content = "Try clicking on any of the entities here or click on Playtest!";
@@ -490,6 +496,7 @@ function showEquipped() {
           }
         }
 }
+
 function mouseClicked() {
   clickedItem = determineClickedItem();
 
@@ -562,9 +569,10 @@ function mouseClicked() {
 
     // console.log(editing);
 
-    if (windowState === "idle" &&
-      (clickedItem.state === "enemy" || clickedItem.state === "ally")) {
-      selectedActor.source = clickedItem.source;
+
+    if (windowState === "idle") {
+      if (clickedItem.state === "enemy" || clickedItem.state === "ally") {
+        selectedActor.source = clickedItem.source;
       uiSet(1);
       if (clickedItem.state === "ally") {
         console.log(clickedItem);
@@ -608,6 +616,17 @@ function mouseClicked() {
         }
       }
       windowState = "edit";
+      }
+      else {
+        if (clickedItem.constructor.name === "ButtonComp") {
+          for (let button of button_add_enemy) {
+            if (clickedItem === button) {
+              let value = button.name;
+              button.func(value);
+            }
+          }
+        }
+      }
     }
 
     if (clickedItem.constructor.name === "ButtonComp") {
